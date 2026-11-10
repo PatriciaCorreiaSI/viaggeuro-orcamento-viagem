@@ -1,4 +1,4 @@
-# Viaggeuro
+# 💶🛬 Viaggeuro
 
 Controle de gastos para viagens, com foco no euro. Você define um teto de gastos por categoria e, a cada gasto lançado, o app mostra quanto já gastou e quanto ainda pode gastar no dia e na viagem toda.
 
