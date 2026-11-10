@@ -1,4 +1,4 @@
-# Orçamento de Viagem
+# 💶🛬 Orçamento de Viagem
 
 App simples para controlar os gastos de uma viagem curta pelo celular. Você define um teto de gastos por categoria e, a cada gasto lançado, o app mostra quanto já gastou e quanto ainda pode gastar no dia e na viagem toda.
 
