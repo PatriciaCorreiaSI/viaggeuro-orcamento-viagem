@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
 <meta name="theme-color" content="#0f1115">
 <meta name="color-scheme" content="dark">
-<title>Orçamento de Viagem</title>
+<title>Viaggeuro</title>
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon-192.png">
 <style>
@@ -109,7 +109,7 @@ nav svg{width:24px;height:24px}
 </head>
 <body>
 <header><div class="in">
-  <h1 id="hTitle">Orçamento de Viagem</h1>
+  <h1 id="hTitle">Viaggeuro</h1>
   <div class="sub" id="hSub"></div>
   <div id="dayrow">
     <div class="seg" role="tablist">
@@ -149,7 +149,7 @@ nav svg{width:24px;height:24px}
   <button class="btn primary" type="submit">Salvar</button>
   <button class="btn danger" type="button" id="fDel">Excluir gasto</button>
 </form>
-<input type="file" id="fileIn" accept=".json,application/json" hidden>
+<input type="file" id="fileIn" hidden>
 <div class="toast" id="toast"></div>
 
 <script>
@@ -233,7 +233,7 @@ function toast(m){var t=$('#toast');t.textContent=m;t.classList.add('on');clearT
 /* ---------- Cabeçalho e dias ---------- */
 function renderHeader(){
   var ds=dates();
-  $('#hTitle').textContent=tab==='home'?'Orçamento de Viagem':tab==='list'?'Gastos':'Ajustes';
+  $('#hTitle').textContent=tab==='home'?'Viaggeuro':tab==='list'?'Gastos':'Ajustes';
   $('#hSub').textContent=ds.length+' dias · '+dShort(ds[0])+' a '+dShort(ds[ds.length-1]);
   $('#dayrow').hidden=tab!=='home';
   if(tab!=='home')return;
@@ -385,6 +385,7 @@ vs.addEventListener('click',function(e){
     var blob=new Blob([JSON.stringify(S,null,2)],{type:'application/json'}),a=document.createElement('a');
     a.href=URL.createObjectURL(blob);a.download='orcamento-viagem-'+todayISO()+'.json';document.body.appendChild(a);a.click();a.remove();
     setTimeout(function(){URL.revokeObjectURL(a.href)},5000);
+    toast('Backup salvo em Downloads');
   }else if(b.id==='imp')$('#fileIn').click();
   else if(b.id==='rst'){
     if(!confirm('Apagar TODOS os gastos e configurações deste aparelho? Isso não pode ser desfeito.'))return;

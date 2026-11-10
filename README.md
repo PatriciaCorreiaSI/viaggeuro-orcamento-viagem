@@ -1,6 +1,6 @@
-# 💶🛬 Orçamento de Viagem
+# Viaggeuro
 
-App simples para controlar os gastos de uma viagem curta pelo celular. Você define um teto de gastos por categoria e, a cada gasto lançado, o app mostra quanto já gastou e quanto ainda pode gastar no dia e na viagem toda.
+Controle de gastos para viagens, com foco no euro. Você define um teto de gastos por categoria e, a cada gasto lançado, o app mostra quanto já gastou e quanto ainda pode gastar no dia e na viagem toda.
 
 Feito para uso no celular (Android), em tema escuro e **sem internet** depois de instalado.
 
