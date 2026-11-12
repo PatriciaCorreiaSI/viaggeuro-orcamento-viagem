@@ -103,6 +103,25 @@ nav svg{width:24px;height:24px}
 .amt:focus-within{outline:2px solid var(--accent)}
 .toast{position:fixed;left:50%;bottom:calc(150px + env(safe-area-inset-bottom));transform:translate(-50%,20px);background:#e8ecf4;color:#0b0d12;padding:10px 18px;border-radius:99px;font-weight:600;font-size:15px;opacity:0;transition:.2s;z-index:30;pointer-events:none;white-space:nowrap}
 .toast.on{opacity:1;transform:translate(-50%,0)}
+.ckhead{display:flex;align-items:center;gap:12px;width:100%;background:none;border:0;color:inherit;font:inherit;text-align:left;min-height:44px;padding:0}
+.ckhead .n{flex:1}
+.chev{width:20px;height:20px;color:var(--muted);transition:transform .2s;flex:0 0 auto}
+.card.open .chev{transform:rotate(90deg)}
+.ck{display:flex;align-items:center;gap:12px;width:100%;min-height:50px;background:none;border:0;border-top:1px solid var(--line);color:var(--text);font:inherit;font-size:16px;text-align:left;padding:8px 0}
+.bar+.ck{border-top:0}
+.box{width:26px;height:26px;border-radius:8px;border:2px solid #5b6270;flex:0 0 auto;display:grid;place-items:center;transition:background .15s,border-color .15s}
+.box svg{width:16px;height:16px;display:none}
+.ck.on .box{background:var(--accent);border-color:var(--accent)}
+.ck.on .box svg{display:block}
+.ck.on .tx{text-decoration:line-through;color:#6b7280}
+.addit{display:flex;gap:8px;margin-top:10px}
+.addit input{min-height:46px;margin:0}
+.addit button{flex:0 0 auto;width:46px;min-height:46px;border-radius:12px;border:0;background:var(--card2);color:var(--accent);font-size:24px;line-height:1}
+.edrow{display:flex;gap:8px;align-items:center;padding:6px 0;border-top:1px solid var(--line)}
+.edrow input{min-height:44px;margin:0}
+.tools{display:flex;gap:8px;margin-top:14px}
+.tools .btn{margin-top:0;min-height:46px;font-size:15px}
+.newg{background:none;border:1px dashed var(--line);color:var(--accent)}
 .shake{animation:sh .3s}
 @keyframes sh{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
 </style>
@@ -127,6 +146,7 @@ nav svg{width:24px;height:24px}
 <main class="in">
   <section id="view-home"></section>
   <section id="view-list" hidden></section>
+  <section id="view-check" hidden></section>
   <section id="view-settings" hidden></section>
 </main>
 
@@ -135,6 +155,7 @@ nav svg{width:24px;height:24px}
 <nav><div class="in">
   <button data-tab="home" class="on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 1 9 9h-9z"/></svg>Início</button>
   <button data-tab="list"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>Gastos</button>
+  <button data-tab="check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="2"/><path d="M4.8 6.6l1.5 1.5 2.6-2.8"/><rect x="3" y="14" width="7" height="7" rx="2"/><path d="M14 7h7M14 18h7"/></svg>Checklist</button>
   <button data-tab="settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></svg>Ajustes</button>
 </div></nav>
 
@@ -173,6 +194,20 @@ function parseNum(v){var s=String(v==null?'':v).trim().replace(/[^\d.,-]/g,'');i
 function showNum(n){return(n==null||isNaN(n))?'':String(Math.round(n*100)/100).replace('.',',')}
 function isISO(s){return typeof s==='string'&&/^\d{4}-\d\d-\d\d$/.test(s)}
 
+/* Checklist sugerido (pode ser editado ou apagado pela pessoa) */
+var CK_DEF=[
+  ['📄','Documentos',['Passaporte','RG / CNH','Cartões de embarque','Seguro viagem','Reservas de hospedagem','Cópias digitais dos documentos']],
+  ['💶','Dinheiro',['Cartão internacional','Cartão de crédito reserva','Euros em espécie','Avisar o banco sobre a viagem']],
+  ['🔌','Eletrônicos',['Celular e carregador','Adaptador de tomada (Europa)','Power bank','Fones de ouvido','Chip / eSIM','Mapas offline baixados']],
+  ['👕','Roupas',['Roupas para os dias','Roupa íntima e meias','Pijama','Casaco / agasalho','Sapato confortável','Guarda-chuva']],
+  ['🧴','Higiene e saúde',['Escova e pasta de dente','Desodorante','Shampoo e itens de banho (até 100 ml)','Remédios de uso contínuo e receitas','Kit de primeiros socorros','Protetor solar']],
+  ['🏠','Antes de sair de casa',['Check-in online feito','Desligar aparelhos da tomada','Fechar janelas e registro de gás','Tirar o lixo','Deixar uma chave com alguém de confiança','Fazer backup do Viaggeuro']]
+];
+function defaultCheck(){
+  return{hideDone:false,groups:CK_DEF.map(function(g,gi){
+    return{id:'g'+gi,name:g[1],icon:g[0],open:gi===0,items:g[2].map(function(t,ii){return{id:'i'+gi+'_'+ii,text:t,done:false}})};
+  })};
+}
 function defaults(){
   function c(id,name,icon,color,dailyOn){return{id:id,name:name,icon:icon,color:color,total:0,daily:null,dailyOn:dailyOn}}
   return{v:1,config:{start:todayISO(),days:8,currency:'EUR',cats:[
@@ -181,7 +216,21 @@ function defaults(){
     c('tel','Telefonia/Internet','📶',COLORS[2],false),
     c('hosp','Hospedagem','🏨',COLORS[3],false),
     c('out','Outros','🛍️',COLORS[4],true)
-  ]},expenses:[],lastCat:'alim'};
+  ]},expenses:[],lastCat:'alim',check:defaultCheck()};
+}
+/* Checklist: aceita só campos conhecidos; dados antigos sem checklist recebem as sugestões */
+function cleanCheck(c){
+  if(!c||!Array.isArray(c.groups))return defaultCheck();
+  var gs=[];
+  c.groups.slice(0,60).forEach(function(g){
+    if(!g||!okId(g.id)||typeof g.name!=='string')return;
+    var its=[];
+    if(Array.isArray(g.items))g.items.slice(0,300).forEach(function(it){
+      if(it&&okId(it.id)&&typeof it.text==='string')its.push({id:it.id,text:it.text.slice(0,60),done:it.done===true});
+    });
+    gs.push({id:g.id,name:g.name.slice(0,30),icon:(typeof g.icon==='string'&&g.icon.length<=8)?g.icon:'📌',open:g.open!==false,items:its});
+  });
+  return{hideDone:c.hideDone===true,groups:gs};
 }
 /* Validação rígida: só aceita dados no formato exato do app e reconstrói o objeto
    apenas com os campos conhecidos. Protege contra arquivos de backup adulterados. */
@@ -202,7 +251,7 @@ function clean(d){
     if(!e||!okId(e.id)||!okId(e.cat)||!okNum(e.amount)||!isISO(e.date))return null;
     ex.push({id:e.id,ts:okNum(e.ts)?e.ts:0,cat:e.cat,amount:e.amount,date:e.date,desc:typeof e.desc==='string'?e.desc.slice(0,40):''});
   }
-  return{v:1,config:{start:c.start,days:c.days,currency:c.currency,cats:cats},expenses:ex,lastCat:okId(d.lastCat)?d.lastCat:cats[0].id};
+  return{v:1,config:{start:c.start,days:c.days,currency:c.currency,cats:cats},expenses:ex,lastCat:okId(d.lastCat)?d.lastCat:cats[0].id,check:cleanCheck(d.check)};
 }
 function valid(d){return clean(d)!==null}
 function load(){try{var s=clean(JSON.parse(localStorage.getItem(KEY)));if(s)return s}catch(e){}return defaults()}
@@ -233,7 +282,7 @@ function toast(m){var t=$('#toast');t.textContent=m;t.classList.add('on');clearT
 /* ---------- Cabeçalho e dias ---------- */
 function renderHeader(){
   var ds=dates();
-  $('#hTitle').textContent=tab==='home'?'Viaggeuro':tab==='list'?'Gastos':'Ajustes';
+  $('#hTitle').textContent=tab==='home'?'Viaggeuro':tab==='list'?'Gastos':tab==='check'?'Checklist':'Ajustes';
   $('#hSub').textContent=ds.length+' dias · '+dShort(ds[0])+' a '+dShort(ds[ds.length-1]);
   $('#dayrow').hidden=tab!=='home';
   if(tab!=='home')return;
@@ -332,6 +381,87 @@ function renderList(){
 }
 $('#view-list').addEventListener('click',function(e){var b=e.target.closest('[data-f]');if(b){filter=b.dataset.f;renderList()}});
 
+/* ---------- Checklist ---------- */
+var ckEdit=false;
+var CHECK_SVG='<svg viewBox="0 0 24 24" fill="none" stroke="#0b0d12" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
+var CHEV_SVG='<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>';
+function ckCount(){var t=0,d=0;S.check.groups.forEach(function(g){g.items.forEach(function(i){t++;if(i.done)d++})});return{t:t,d:d}}
+/* no checklist, quanto mais marcado melhor: amarelo < 50%, azul até 99%, verde em 100% */
+function ckCol(p){return p==null?'var(--muted)':p>=100?'var(--ok)':p>=50?'var(--accent)':'var(--warn)'}
+function ringCk(p){
+  var r=46,C=2*Math.PI*r,f=Math.min(p||0,100)/100;
+  return'<div class="ring"><svg viewBox="0 0 112 112" width="112" height="112"><circle cx="56" cy="56" r="'+r+'" fill="none" stroke="var(--card2)" stroke-width="11"/>'+
+    (f>0?'<circle cx="56" cy="56" r="'+r+'" fill="none" stroke="'+ckCol(p)+'" stroke-width="11" stroke-linecap="round" stroke-dasharray="'+(C*f)+' '+C+'"/>':'')+
+    '</svg><div class="c" style="color:'+ckCol(p)+'">'+pctTxt(p)+'</div></div>';
+}
+function renderCheck(){
+  var K=S.check,n=ckCount(),p=n.t?n.d/n.t*100:null,h='';
+  h+='<div class="card"><div class="hero">'+ringCk(p)+'<div class="kv"><div class="v">'+n.d+' de '+n.t+'</div><div class="s">itens prontos</div>'+
+    (n.t&&n.d===n.t?'<div class="note ok" style="margin-top:6px">Tudo pronto. Boa viagem!</div>':'')+'</div></div>'+
+    '<div class="tools"><button type="button" class="btn ghost" data-act="hide">'+(K.hideDone?'Mostrar marcados':'Ocultar marcados')+'</button>'+
+    '<button type="button" class="btn ghost" data-act="edit">'+(ckEdit?'Concluir edição':'Editar lista')+'</button></div></div>';
+  K.groups.forEach(function(g,gi){
+    var t=g.items.length,d=g.items.filter(function(i){return i.done}).length,open=g.open||ckEdit;
+    h+='<div class="card'+(open?' open':'')+'">';
+    if(ckEdit){
+      h+='<div class="edrow" style="border-top:0;padding-top:0"><span class="ico" style="--cc:var(--accent)">'+esc(g.icon)+'</span><input data-f="gname" data-g="'+gi+'" value="'+esc(g.name)+'" maxlength="30" aria-label="Nome do tópico"><button type="button" class="x" data-act="rmg" data-g="'+gi+'" aria-label="Excluir tópico">✕</button></div>';
+      g.items.forEach(function(it,ii){
+        h+='<div class="edrow"><input data-f="itext" data-g="'+gi+'" data-i="'+ii+'" value="'+esc(it.text)+'" maxlength="60" aria-label="Item"><button type="button" class="x" data-act="rmi" data-g="'+gi+'" data-i="'+ii+'" aria-label="Excluir item">✕</button></div>';
+      });
+    }else{
+      h+='<button type="button" class="ckhead" data-act="tg" data-g="'+gi+'" aria-expanded="'+(g.open?'true':'false')+'"><span class="ico" style="--cc:var(--accent)">'+esc(g.icon)+'</span><span class="n">'+esc(g.name)+'</span><span class="s">'+d+'/'+t+'</span>'+CHEV_SVG+'</button>'+
+        '<div class="bar"><i class="ok" style="width:'+(t?d/t*100:0)+'%"></i></div>';
+      if(g.open){
+        var shown=0;
+        g.items.forEach(function(it,ii){
+          if(K.hideDone&&it.done)return;shown++;
+          h+='<button type="button" class="ck'+(it.done?' on':'')+'" data-act="ck" data-g="'+gi+'" data-i="'+ii+'" role="checkbox" aria-checked="'+(it.done?'true':'false')+'"><span class="box">'+CHECK_SVG+'</span><span class="tx">'+esc(it.text)+'</span></button>';
+        });
+        if(!shown)h+='<div class="empty">'+(t?'Tudo pronto neste tópico.':'Nenhum item ainda.')+'</div>';
+      }
+    }
+    if(open)h+='<form class="addit" data-g="'+gi+'" autocomplete="off"><input placeholder="Adicionar item" maxlength="60" enterkeyhint="done" aria-label="Novo item em '+esc(g.name)+'"><button type="submit" aria-label="Adicionar item">+</button></form>';
+    h+='</div>';
+  });
+  if(!K.groups.length)h+='<div class="card"><div class="empty">Sua lista está vazia. Crie um tópico para começar.</div></div>';
+  h+='<button type="button" class="btn newg" data-act="newg">+ Novo tópico</button>';
+  if(n.d)h+='<button type="button" class="btn danger" data-act="uncheck">Desmarcar todos os itens</button>';
+  $('#view-check').innerHTML=h;
+}
+var vc=$('#view-check');
+vc.addEventListener('click',function(e){
+  var b=e.target.closest('[data-act]');if(!b)return;
+  var K=S.check,a=b.dataset.act,gi=Number(b.dataset.g),g=K.groups[gi];
+  if(a==='ck'){var it=g.items[Number(b.dataset.i)];it.done=!it.done}
+  else if(a==='tg')g.open=!g.open;
+  else if(a==='hide')K.hideDone=!K.hideDone;
+  else if(a==='edit')ckEdit=!ckEdit;
+  else if(a==='rmi')g.items.splice(Number(b.dataset.i),1);
+  else if(a==='rmg'){if(g.items.length&&!confirm('Excluir o tópico "'+g.name+'" e seus '+g.items.length+' itens?'))return;K.groups.splice(gi,1)}
+  else if(a==='uncheck'){if(!confirm('Desmarcar todos os itens? Útil para refazer a mala na volta.'))return;K.groups.forEach(function(x){x.items.forEach(function(i){i.done=false})})}
+  else if(a==='newg'){
+    K.groups.push({id:uid(),name:'Novo tópico',icon:'📌',open:true,items:[]});ckEdit=true;save();renderCheck();
+    var ins=vc.querySelectorAll('[data-f=gname]');ins=ins[ins.length-1];if(ins){ins.focus();ins.select()}return;
+  }
+  else return;
+  save();renderCheck();
+});
+vc.addEventListener('input',function(e){
+  var t=e.target,g=S.check.groups[Number(t.dataset.g)];if(!g)return;
+  if(t.dataset.f==='gname')g.name=t.value.trim()||'Tópico';
+  else if(t.dataset.f==='itext'){var it=g.items[Number(t.dataset.i)];if(it)it.text=t.value.trim()||'Item'}
+  else return;
+  save();
+});
+vc.addEventListener('submit',function(e){
+  e.preventDefault();
+  var f=e.target,gi=Number(f.dataset.g),g=S.check.groups[gi],inp=f.querySelector('input'),v=inp.value.trim();
+  if(!g||!v){inp.focus();return}
+  g.items.push({id:uid(),text:v.slice(0,60),done:false});save();renderCheck();
+  var ni=vc.querySelector('form.addit[data-g="'+gi+'"] input');if(ni)ni.focus();
+  toast('Item adicionado');
+});
+
 /* ---------- Ajustes ---------- */
 function renderSettings(){
   var c=S.config,h='';
@@ -383,7 +513,7 @@ vs.addEventListener('click',function(e){
     var inp=vs.querySelectorAll('[data-f=name]');inp=inp[inp.length-1];inp.focus();inp.select();
   }else if(b.id==='exp'){
     var blob=new Blob([JSON.stringify(S,null,2)],{type:'application/json'}),a=document.createElement('a');
-    a.href=URL.createObjectURL(blob);a.download='orcamento-viagem-'+todayISO()+'.json';document.body.appendChild(a);a.click();a.remove();
+    a.href=URL.createObjectURL(blob);a.download='viaggeuro-backup-'+todayISO()+'.json';document.body.appendChild(a);a.click();a.remove();
     setTimeout(function(){URL.revokeObjectURL(a.href)},5000);
     toast('Backup salvo em Downloads');
   }else if(b.id==='imp')$('#fileIn').click();
@@ -451,13 +581,14 @@ document.addEventListener('click',function(e){
 function setTab(t){
   tab=t;
   document.querySelectorAll('nav button').forEach(function(b){b.classList.toggle('on',b.dataset.tab===t)});
-  $('#view-home').hidden=t!=='home';$('#view-list').hidden=t!=='list';$('#view-settings').hidden=t!=='settings';
-  $('#fab').hidden=t==='settings';
+  $('#view-home').hidden=t!=='home';$('#view-list').hidden=t!=='list';$('#view-check').hidden=t!=='check';$('#view-settings').hidden=t!=='settings';
+  $('#fab').hidden=t==='settings'||t==='check';
+  if(t!=='check')ckEdit=false;
   if(t==='settings')renderSettings();
   render();window.scrollTo(0,0);
 }
 document.querySelectorAll('nav button').forEach(function(b){b.addEventListener('click',function(){setTab(b.dataset.tab)})});
-function render(){renderHeader();if(tab==='home')renderHome();else if(tab==='list')renderList()}
+function render(){renderHeader();if(tab==='home')renderHome();else if(tab==='list')renderList();else if(tab==='check')renderCheck()}
 
 /* Atualiza o "hoje" ao voltar para o app em outro dia */
 var lastDay=todayISO();

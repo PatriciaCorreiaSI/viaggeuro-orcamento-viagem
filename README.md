@@ -12,7 +12,8 @@ Feito para uso no celular (Android), em tema escuro e **sem internet** depois de
 - **Cores de alerta:** verde abaixo de 70% do teto, amarelo de 70% a 100%, vermelho quando o teto é ultrapassado.
 - **Média disponível:** quanto ainda dá para gastar por dia nos dias que faltam.
 - **Histórico:** gastos agrupados por dia, com filtro por categoria. Tocar num gasto permite editar ou excluir.
-- **Backup:** exportar e importar os dados em um arquivo `.json`.
+- **Checklist da viagem:** lista do que levar e do que fazer antes de sair, com tópicos sugeridos (Documentos, Dinheiro, Eletrônicos, Roupas, Higiene e saúde, Antes de sair de casa). Dá para marcar, riscar, criar tópicos e itens novos ou apagar os sugeridos.
+- **Backup:** exportar e importar os dados (gastos e checklist) em um arquivo `.json`.
 
 ## Privacidade
 
