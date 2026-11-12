@@ -153,10 +153,10 @@ nav svg{width:24px;height:24px}
 <button class="fab" id="fab" aria-label="Lançar gasto">+</button>
 
 <nav><div class="in">
-  <button data-tab="home" class="on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 1 9 9h-9z"/></svg>Início</button>
-  <button data-tab="list"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>Gastos</button>
+  <button data-tab="home" class="on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 1 9 9h-9z"/></svg>Resumo</button>
+  <button data-tab="list"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>Extrato</button>
+  <button data-tab="settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12V4a1 1 0 0 1 1-1h8l9 9-9 9z"/><circle cx="7.5" cy="7.5" r="1.5"/></svg>Categorias</button>
   <button data-tab="check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="2"/><path d="M4.8 6.6l1.5 1.5 2.6-2.8"/><rect x="3" y="14" width="7" height="7" rx="2"/><path d="M14 7h7M14 18h7"/></svg>Checklist</button>
-  <button data-tab="settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></svg>Ajustes</button>
 </div></nav>
 
 <div class="backdrop" id="backdrop"></div>
@@ -282,7 +282,7 @@ function toast(m){var t=$('#toast');t.textContent=m;t.classList.add('on');clearT
 /* ---------- Cabeçalho e dias ---------- */
 function renderHeader(){
   var ds=dates();
-  $('#hTitle').textContent=tab==='home'?'Viaggeuro':tab==='list'?'Gastos':tab==='check'?'Checklist':'Ajustes';
+  $('#hTitle').textContent=tab==='home'?'Viaggeuro':tab==='list'?'Extrato':tab==='check'?'Checklist':'Categorias';
   $('#hSub').textContent=ds.length+' dias · '+dShort(ds[0])+' a '+dShort(ds[ds.length-1]);
   $('#dayrow').hidden=tab!=='home';
   if(tab!=='home')return;
@@ -303,14 +303,14 @@ $('#mTrip').addEventListener('click',function(){if(sel>=0){sel=-1;render()}});
 $('#dPrev').addEventListener('click',function(){goDay(sel-1)});
 $('#dNext').addEventListener('click',function(){goDay(sel+1)});
 $('#dCur').addEventListener('click',function(){var t=todayIdx();if(t>=0)goDay(t)});
-/* deslizar o dedo para os lados na tela Início também troca o dia */
+/* deslizar o dedo para os lados na tela Resumo também troca o dia */
 (function(){var x0=null,y0=0,vh=$('#view-home');
   vh.addEventListener('touchstart',function(e){if(sel<0||e.touches.length>1){x0=null;return}x0=e.touches[0].clientX;y0=e.touches[0].clientY},{passive:true});
   vh.addEventListener('touchend',function(e){if(x0==null)return;var dx=e.changedTouches[0].clientX-x0,dy=e.changedTouches[0].clientY-y0;x0=null;
     if(Math.abs(dx)>70&&Math.abs(dx)>Math.abs(dy)*1.5)goDay(sel+(dx<0?1:-1))},{passive:true});
 })();
 
-/* ---------- Início ---------- */
+/* ---------- Resumo ---------- */
 function ring(p){
   var r=46,C=2*Math.PI*r,f=Math.min(p||0,100)/100,col=st(p)?'var(--'+st(p)+')':'var(--muted)';
   return'<div class="ring"><svg viewBox="0 0 112 112" width="112" height="112"><circle cx="56" cy="56" r="'+r+'" fill="none" stroke="var(--card2)" stroke-width="11"/>'+
@@ -335,13 +335,13 @@ function renderHome(){
       '<div class="kv"><div class="l">Gasto no dia</div><div class="v">'+money(spD)+'</div><div class="s">de '+money(capD)+'</div>'+
       '<div class="l" style="margin-top:10px">Ainda posso gastar hoje</div><div class="v '+remCls(remD)+'">'+money(remD)+'</div></div></div>'+
       (spNo>0?'<div class="note">+ '+money(spNo)+' em categorias sem teto diário</div>':'')+
-      (capT===0?'<div class="note">Defina os tetos em <b>Ajustes</b> para ver quanto ainda pode gastar.</div>':'')+'</div>';
+      (capT===0?'<div class="note">Defina os tetos em <b>Categorias</b> para ver quanto ainda pode gastar.</div>':'')+'</div>';
   }
   h+='<div class="card"><div class="ttl">Viagem toda</div>'+(d?'':'<div class="hero" style="margin-bottom:6px">'+ring(pT)+'<div class="kv"><div class="l">Gasto total</div><div class="v">'+money(spT)+'</div><div class="s">de '+money(capT)+'</div><div class="l" style="margin-top:10px">Ainda posso gastar</div><div class="v '+remCls(remT)+'">'+money(remT)+'</div></div></div>')+
     (d?'<div class="grid2"><div><div class="l">Gasto</div><div class="v">'+money(spT)+'</div></div><div><div class="l">Restante</div><div class="v '+remCls(remT)+'">'+money(remT)+'</div></div></div>'+bar(pT)+
       '<div class="row sp s"><span>'+money(spT)+' de '+money(capT)+'</span><b class="'+st(pT)+'">'+pctTxt(pT)+'</b></div>':'')+
     (left>0&&capT>0?'<div class="hl">Pode gastar por dia daqui pra frente ('+left+(left===1?' dia':' dias')+'): <b class="'+remCls(remT)+'">'+money(remT/left)+'</b></div>':'')+
-    (capT===0&&!d?'<div class="note">Defina os tetos em <b>Ajustes</b>.</div>':'')+'</div>';
+    (capT===0&&!d?'<div class="note">Defina os tetos em <b>Categorias</b>.</div>':'')+'</div>';
 
   h+='<div class="card"><div class="ttl">Categorias · '+(d?'no dia':'viagem toda')+'</div>';
   cats.forEach(function(c){
@@ -462,7 +462,7 @@ vc.addEventListener('submit',function(e){
   toast('Item adicionado');
 });
 
-/* ---------- Ajustes ---------- */
+/* ---------- Categorias (configuração da viagem, tetos e backup) ---------- */
 function renderSettings(){
   var c=S.config,h='';
   h+='<div class="card"><div class="ttl">Viagem</div><div class="grid2"><label>Início<input type="date" id="sStart" value="'+c.start+'"></label><label>Dias<input id="sDays" inputmode="numeric" value="'+c.days+'"></label></div>'+
@@ -475,7 +475,7 @@ function renderSettings(){
       '<label class="sw"><input type="checkbox" data-f="dailyOn"'+(k.dailyOn?' checked':'')+'> Usar teto diário</label></div>';
   });
   h+='<button type="button" class="btn ghost" id="addCat">+ Adicionar categoria</button><div class="sum" id="sSum"></div></div>';
-  h+='<div class="card"><div class="ttl">Dados</div><div class="note" style="margin-top:0">Tudo fica salvo só neste aparelho, sem login e sem internet. Faça um backup de vez em quando.</div>'+
+  h+='<div class="card"><div class="ttl">Backup dos gastos e do checklist</div><div class="note" style="margin-top:0">Tudo fica salvo só neste aparelho, sem login e sem internet. Faça um backup de vez em quando.</div>'+
     '<button type="button" class="btn ghost" id="exp">Exportar backup (.json)</button><button type="button" class="btn ghost" id="imp">Importar backup</button><button type="button" class="btn danger" id="rst">Apagar todos os dados</button></div>';
   $('#view-settings').innerHTML=h;updSum();
 }

@@ -26,10 +26,10 @@ Feito para uso no celular (Android), em tema escuro e **sem internet** depois de
 
 1. Abra o link do app (na seção **About** deste repositório) no **Chrome**.
 2. Toque no menu **⋮** e depois em **Instalar app** (ou **Adicionar à tela inicial**).
-3. Abra o app pelo ícone e configure os tetos em **Ajustes**.
+3. Abra o app pelo ícone e configure a viagem e os tetos em **Categorias**.
 4. Para testar sem internet: ative o modo avião e abra o app de novo.
 
-Dica: faça um backup de vez em quando em **Ajustes → Exportar backup**.
+Dica: faça um backup de vez em quando em **Categorias → Exportar backup**.
 
 ## Como funciona
 
