@@ -1,10 +1,14 @@
 // Guarda o app no aparelho para abrir sem internet.
 // Ao publicar uma versão nova, troque o número em CACHE.
-var CACHE = 'orcviagem-v3';
+var CACHE = 'orcviagem-v4';
 var FILES = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png'];
 
 self.addEventListener('install', function (e) {
-  e.waitUntil(caches.open(CACHE).then(function (c) { return c.addAll(FILES); }));
+  // cache: 'reload' busca direto no servidor, ignorando a cópia temporária do navegador,
+  // para que a versão nova seja realmente a guardada.
+  e.waitUntil(caches.open(CACHE).then(function (c) {
+    return c.addAll(FILES.map(function (f) { return new Request(f, { cache: 'reload' }); }));
+  }));
   self.skipWaiting();
 });
 

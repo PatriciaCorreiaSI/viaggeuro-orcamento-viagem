@@ -597,7 +597,12 @@ document.addEventListener('visibilitychange',function(){if(!document.hidden&&tod
 if(!S.config.cats.some(function(c){return c.total>0}))setTab('settings');else render();
 
 if(navigator.storage&&navigator.storage.persist)navigator.storage.persist().catch(function(){});
-if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol))navigator.serviceWorker.register('sw.js').catch(function(){});
+if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)){
+  /* quando chega uma versão nova do app, recarrega uma vez para já mostrá-la */
+  var hadCtrl=!!navigator.serviceWorker.controller,reloaded=false;
+  navigator.serviceWorker.addEventListener('controllerchange',function(){if(hadCtrl&&!reloaded){reloaded=true;location.reload()}});
+  navigator.serviceWorker.register('sw.js').catch(function(){});
+}
 })();
 </script>
 </body>
